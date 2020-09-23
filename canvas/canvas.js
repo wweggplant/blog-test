@@ -21,25 +21,40 @@ function drawLine(ctx, start, end) {
   }
 }
 
-function touchStart(e) {
+function touchStart(start) {
   canPaint = true
-  last = [e.clientX, e.clientY]
+  last = start
 }
-function touchMove(e) {
+function touchMove(move) {
   if (canPaint) {
-    drawLine(ctx, last, [e.clientX, e.clientY])
-    last = [e.clientX, e.clientY]
+    drawLine(ctx, last, move)
+    last = move
   }
 }
 function touchEnd(e) {
   canPaint = false
 }
-$canvas.addEventListener('mousedown', (e) => {
-  touchStart(e)
-})
-$canvas.addEventListener('mousemove', (e) => {
-  touchMove(e)
-})
-$canvas.addEventListener('mouseup', (e) => {
-  touchEnd(e)
-})
+if ('ontouchstart' in document) {
+  $canvas.addEventListener('touchstart', (e) => {
+    const touch = e.touches[0]
+    touchStart([touch.clientX, touch.clientY])
+  })
+  $canvas.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0]
+    touchMove([touch.clientX, touch.clientY])
+  })
+  $canvas.addEventListener('touchend', (e) => {
+    touchEnd(e)
+  })
+} else {
+  $canvas.addEventListener('mousedown', (e) => {
+    touchStart([e.clientX, e.clientY])
+  })
+  $canvas.addEventListener('mousemove', (e) => {
+    touchMove([e.clientX, e.clientY])
+  })
+  $canvas.addEventListener('mouseup', (e) => {
+    touchEnd(e)
+  })
+}
+
